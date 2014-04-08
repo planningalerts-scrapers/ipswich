@@ -11,8 +11,8 @@ def scrape_page(page, comment_url)
       "info_url" => (page.uri + tr.search('td').at('a')["href"]).to_s,
       "council_reference" => tds[1],
       "date_received" => Date.new(year, month, day).to_s,
-      "description" => tds[3].gsub("&amp;", "&").split("<br>")[1].squeeze.strip,
-      "address" => tds[3].gsub("&amp;", "&").split("<br>")[0].gsub("\r", " ").squeeze.strip,
+      "description" => tds[3].gsub("&amp;", "&").split("<br>")[1].squeeze(" ").strip,
+      "address" => tds[3].gsub("&amp;", "&").split("<br>")[0].gsub("\r", " ").squeeze(" ").strip,
       "date_scraped" => Date.today.to_s,
       "comment_url" => comment_url
     }
