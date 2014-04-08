@@ -12,11 +12,11 @@ def scrape_page(page, comment_url)
       "council_reference" => tds[1],
       "date_received" => Date.new(year, month, day).to_s,
       "description" => tds[3].gsub("&amp;", "&").split("<br>")[1].squeeze.strip,
-      "address" => tds[3].gsub("&amp;", "&").split("<br>")[0].gsub("\r", " ").squeeze.strip + ", NSW",
+      "address" => tds[3].gsub("&amp;", "&").split("<br>")[0].gsub("\r", " ").squeeze.strip,
       "date_scraped" => Date.today.to_s,
       "comment_url" => comment_url
     }
-    # p record
+    #p record
     if (ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? rescue true)
       ScraperWiki.save_sqlite(['council_reference'], record)
     else
@@ -41,9 +41,8 @@ def click(page, doc)
   end
 end
 
-url_base = "http://hsconline.hornsby.nsw.gov.au/appenquiry/modules/applicationmaster/default.aspx"
-url = url_base + "?page=found&1=thismonth&4a=437&6=F"
-comment_url = "mailto:devmail@hornsby.nsw.gov.au"
+url = "http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx?page=found&1=thismonth&5=T&6=F"
+comment_url = "mailto:plandev@ipswich.qld.gov.au"
 
 agent = Mechanize.new
 
