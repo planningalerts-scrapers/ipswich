@@ -2,10 +2,6 @@ require 'scraperwiki'
 require 'mechanize'
 
 case ENV['MORPH_PERIOD']
-  when 'lastyear'
-    period = (Date.today-365).strftime("1/1/%Y")+'&2='+(Date.today-365).strftime("31/12/%Y")
-  when 'thisyear'
-    period = (Date.today).strftime("1/1/%Y")+'&2='+(Date.today).strftime("31/12/%Y")
   when 'lastmonth'
     period = 'lastmonth'
   when 'thismonth'
