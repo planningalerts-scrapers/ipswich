@@ -2,16 +2,34 @@ require 'scraperwiki'
 require 'mechanize'
 
 case ENV['MORPH_PERIOD']
-  when 'lastyear'
-    period = (Date.today-365).strftime("1/1/%Y")+'&2='+(Date.today-365).strftime("31/12/%Y")
-  when 'thisyear'
-    period = (Date.today).strftime("1/1/%Y")+'&2='+(Date.today).strftime("31/12/%Y")
+  when /^([2][0][0-9][0-9][0|1][0-9])/
+    if ( ENV['MORPH_PERIOD'][0..3].to_i > Date.today.year.to_i )
+      ENV['MORPH_PERIOD'] = Date.today.year.to_s
+      puts 'changing invalid year input'
+    end
+
+    month = ENV['MORPH_PERIOD'][4..5].to_i
+    if ( month < 1 || month > 12 )
+      ENV['MORPH_PERIOD'] = Date.today.year.to_s + Date.today.month.to_s
+      puts 'changing invalid month input'
+    end
+
+    period = 'custom year and month: ' + ENV['MORPH_PERIOD']
+    start_date = Date.new(ENV['MORPH_PERIOD'][0..3].to_i, ENV['MORPH_PERIOD'][4..5].to_i, 1)
+    end_date   = Date.new(ENV['MORPH_PERIOD'][0..3].to_i, ENV['MORPH_PERIOD'][4..5].to_i + 1 , 1) - 1
   when 'lastmonth'
     period = 'lastmonth'
+    start_date = (Date.today - Date.today.mday) - (Date.today - Date.today.mday - 1).mday
+    end_date   = Date.today - Date.today.day
   when 'thismonth'
     period = 'thismonth'
+    start_date = (Date.today - Date.today.mday + 1)
+    end_date   = Date.today
   else
     period = (Date.today - 14).strftime("%d/%m/%Y")+'&2='+(Date.today).strftime("%d/%m/%Y")
+    period = 'thisweek'
+    start_date = Date.today - 14
+    end_date   = Date.today
 end
 
 puts "Collecting data from " + period
@@ -32,6 +50,7 @@ def scrape_page(page, comment_url)
     }
     #p record
     if (ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? rescue true)
+      puts "Saving record " + record['council_reference'] + ", " + record['address']
       ScraperWiki.save_sqlite(['council_reference'], record)
     else
       puts "Skipping already saved record " + record['council_reference']
@@ -55,7 +74,7 @@ def click(page, doc)
   end
 end
 
-url = "http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx?page=found&1="+period+"&5=T&6=F"
+url = "http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx"
 comment_url = "mailto:plandev@ipswich.qld.gov.au"
 
 agent = Mechanize.new
@@ -66,23 +85,31 @@ page = agent.get(url)
 form = page.forms.first
 button = form.button_with(value: "I Agree")
 form.submit(button)
-# It doesn't even redirect to the correct place. Ugh
-page = agent.get(url)
-current_page_no = 1
-next_page_link = true
 
-while next_page_link
-  puts "Scraping page #{current_page_no}..."
-  scrape_page(page, comment_url)
+(start_date..end_date).each do |date|
+  query_period = "?page=found&5=T&6=F&1=" + start_date.strftime("%d/%m/%Y") + "&=" + start_date.strftime("%d/%m/%Y")
 
-  page_links = page.at(".rgNumPart")
-  if page_links
-    next_page_link = page_links.search("a").find{|a| a.inner_text == (current_page_no + 1).to_s}
-  else
-    next_page_link = nil
+  puts "Date: " + start_date.to_s
+
+  page = agent.get(url + query_period)
+  current_page_no = 1
+  next_page_link = true
+
+  while next_page_link
+    puts "Scraping page #{current_page_no}..."
+    scrape_page(page, comment_url)
+
+    page_links = page.at(".rgNumPart")
+    if page_links
+      next_page_link = page_links.search("a").find{|a| a.inner_text == (current_page_no + 1).to_s}
+    else
+      next_page_link = nil
+    end
+    if next_page_link
+      current_page_no += 1
+      page = click(page, next_page_link)
+    end
   end
-  if next_page_link
-    current_page_no += 1
-    page = click(page, next_page_link)
-  end
+
+  start_date = start_date + 1
 end
