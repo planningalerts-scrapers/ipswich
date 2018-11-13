@@ -74,7 +74,7 @@ def click(page, doc)
   end
 end
 
-url = "http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx?page=found&1="+period+"&5=T&6=F"
+url = "http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx"
 comment_url = "mailto:plandev@ipswich.qld.gov.au"
 
 agent = Mechanize.new
@@ -85,23 +85,31 @@ page = agent.get(url)
 form = page.forms.first
 button = form.button_with(value: "I Agree")
 form.submit(button)
-# It doesn't even redirect to the correct place. Ugh
-page = agent.get(url)
-current_page_no = 1
-next_page_link = true
 
-while next_page_link
-  puts "Scraping page #{current_page_no}..."
-  scrape_page(page, comment_url)
+(start_date..end_date).each do |date|
+  query_period = "?page=found&5=T&6=F&1=" + start_date.strftime("%d/%m/%Y") + "&=" + start_date.strftime("%d/%m/%Y")
 
-  page_links = page.at(".rgNumPart")
-  if page_links
-    next_page_link = page_links.search("a").find{|a| a.inner_text == (current_page_no + 1).to_s}
-  else
-    next_page_link = nil
+  puts "Date: " + start_date.to_s
+
+  page = agent.get(url + query_period)
+  current_page_no = 1
+  next_page_link = true
+
+  while next_page_link
+    puts "Scraping page #{current_page_no}..."
+    scrape_page(page, comment_url)
+
+    page_links = page.at(".rgNumPart")
+    if page_links
+      next_page_link = page_links.search("a").find{|a| a.inner_text == (current_page_no + 1).to_s}
+    else
+      next_page_link = nil
+    end
+    if next_page_link
+      current_page_no += 1
+      page = click(page, next_page_link)
+    end
   end
-  if next_page_link
-    current_page_no += 1
-    page = click(page, next_page_link)
-  end
+
+  start_date = start_date + 1
 end
