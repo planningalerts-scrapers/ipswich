@@ -83,7 +83,7 @@ button = form.button_with(value: "I Agree")
 form.submit(button)
 
 (start_date..end_date).each do |date|
-  query_period = "?page=found&5=T&6=F&1=" + start_date.strftime("%d/%m/%Y") + "&=" + start_date.strftime("%d/%m/%Y")
+  query_period = "?page=found&5=T&6=F&1=" + start_date.strftime("%d/%m/%Y") + "&2=" + start_date.strftime("%d/%m/%Y")
 
   puts "Date: " + start_date.to_s
 
