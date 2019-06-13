@@ -35,7 +35,7 @@ end
 puts "Collecting data from " + period
 # Scraping from Masterview 2.0
 
-def scrape_page(page, comment_url)
+def scrape_page(page)
   page.at("table.rgMasterTable").search("tr.rgRow,tr.rgAltRow").each do |tr|
     tds = tr.search('td').map{|t| t.inner_html.gsub("\r\n", "").strip}
     day, month, year = tds[2].split("/").map{|s| s.to_i}
@@ -45,8 +45,7 @@ def scrape_page(page, comment_url)
       "date_received" => Date.new(year, month, day).to_s,
       "description" => tds[3].gsub("&amp;", "&").split("<br>")[1].squeeze(" ").strip,
       "address" => tds[3].gsub("&amp;", "&").split("<br>")[0].gsub("\r", " ").squeeze(" ").strip,
-      "date_scraped" => Date.today.to_s,
-      "comment_url" => comment_url
+      "date_scraped" => Date.today.to_s
     }
     #p record
     puts "Saving record " + record['council_reference'] + ", " + record['address']
@@ -71,7 +70,6 @@ def click(page, doc)
 end
 
 url = "http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx"
-comment_url = "mailto:plandev@ipswich.qld.gov.au"
 
 agent = Mechanize.new
 
@@ -93,7 +91,7 @@ form.submit(button)
 
   while next_page_link
     puts "Scraping page #{current_page_no}..."
-    scrape_page(page, comment_url)
+    scrape_page(page)
 
     page_links = page.at(".rgNumPart")
     if page_links
