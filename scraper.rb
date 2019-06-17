@@ -1,9 +1,6 @@
 require 'scraperwiki'
 require 'mechanize'
 
-start_date = Date.today - 14
-end_date   = Date.today
-
 # Scraping from Masterview 2.0
 
 def scrape_page(page)
@@ -51,10 +48,10 @@ form = page.forms.first
 button = form.button_with(value: "I Agree")
 form.submit(button)
 
-(start_date..end_date).each do |date|
-  query_period = "?page=found&5=T&6=F&1=" + start_date.strftime("%d/%m/%Y") + "&2=" + start_date.strftime("%d/%m/%Y")
+((Date.today - 14)..(Date.today)).each do |date|
+  query_period = "?page=found&5=T&6=F&1=" + date.strftime("%d/%m/%Y") + "&2=" + date.strftime("%d/%m/%Y")
 
-  puts "Date: " + start_date.to_s
+  puts "Date: " + date.to_s
 
   page = agent.get(url + query_period)
   current_page_no = 1
@@ -75,6 +72,4 @@ form.submit(button)
       page = click(page, next_page_link)
     end
   end
-
-  start_date = start_date + 1
 end
