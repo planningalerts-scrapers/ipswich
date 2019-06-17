@@ -1,38 +1,9 @@
 require 'scraperwiki'
 require 'mechanize'
 
-case ENV['MORPH_PERIOD']
-  when /^([2][0][0-9][0-9][0|1][0-9])/
-    if ( ENV['MORPH_PERIOD'][0..3].to_i > Date.today.year.to_i )
-      ENV['MORPH_PERIOD'] = Date.today.year.to_s
-      puts 'changing invalid year input'
-    end
+start_date = Date.today - 14
+end_date   = Date.today
 
-    month = ENV['MORPH_PERIOD'][4..5].to_i
-    if ( month < 1 || month > 12 )
-      ENV['MORPH_PERIOD'] = Date.today.year.to_s + Date.today.month.to_s
-      puts 'changing invalid month input'
-    end
-
-    period = 'custom year and month: ' + ENV['MORPH_PERIOD']
-    start_date = Date.new(ENV['MORPH_PERIOD'][0..3].to_i, ENV['MORPH_PERIOD'][4..5].to_i, 1)
-    end_date   = Date.new(ENV['MORPH_PERIOD'][0..3].to_i, ENV['MORPH_PERIOD'][4..5].to_i + 1 , 1) - 1
-  when 'lastmonth'
-    period = 'lastmonth'
-    start_date = (Date.today - Date.today.mday) - (Date.today - Date.today.mday - 1).mday
-    end_date   = Date.today - Date.today.day
-  when 'thismonth'
-    period = 'thismonth'
-    start_date = (Date.today - Date.today.mday + 1)
-    end_date   = Date.today
-  else
-    period = (Date.today - 14).strftime("%d/%m/%Y")+'&2='+(Date.today).strftime("%d/%m/%Y")
-    period = 'thisweek'
-    start_date = Date.today - 14
-    end_date   = Date.today
-end
-
-puts "Collecting data from " + period
 # Scraping from Masterview 2.0
 
 def scrape_page(page)
