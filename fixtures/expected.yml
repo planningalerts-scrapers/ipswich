@@ -2,9 +2,10 @@
 - info_url: http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx?page=wrapper&key=844342
   council_reference: ADP-3570/2019
   date_received: '2019-05-03'
-  description: ADP - Reconfiguration of a lot - One (1) lot in Fifty-Eight (58) lots,
-    New Road and Common Property and Material Change of Use for Detached Houses to
-    Create 56 Lots, 1 Management lot and 1 Balanced Lot - 2 Stages
+  description: ADP - Reconfiguration of One (1) lot into Two (2) Management Lots plus
+    Common Property, as Phase A; Reconfiguration of One (1) Lot in Fifty-Six(56) Lots,
+    One (1) Management Lot, One (1) Balance Lot plus Common Property and Road, as
+    Phase B in Two (2) Stages
   address: 7001 Brookwater Drive BROOKWATER QLD 4300
   date_scraped: '2019-05-14'
 - info_url: http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx?page=wrapper&key=846089
@@ -16,8 +17,7 @@
 - info_url: http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx?page=wrapper&key=846098
   council_reference: ADP-3674/2019
   date_received: '2019-05-09'
-  description: Area Development Plan - Indoor Entertainment Use within Stage 3 Orion
-    Springfield Central
+  description: Indoor Entertainment (Amusement Parlour)
   address: 1 Main Street SPRINGFIELD CENTRAL QLD 4300
   date_scraped: '2019-05-14'
 - info_url: http://pdonline.ipswich.qld.gov.au/pdonline/modules/applicationmaster/default.aspx?page=wrapper&key=847558
