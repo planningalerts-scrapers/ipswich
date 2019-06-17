@@ -48,28 +48,24 @@ form = page.forms.first
 button = form.button_with(value: "I Agree")
 form.submit(button)
 
-((Date.today - 14)..(Date.today)).each do |date|
-  query_period = "?page=found&5=T&6=F&1=" + date.strftime("%d/%m/%Y") + "&2=" + date.strftime("%d/%m/%Y")
+query_period = "?page=found&5=T&6=F&1=" + (Date.today - 14).strftime("%d/%m/%Y") + "&2=" + Date.today.strftime("%d/%m/%Y")
 
-  puts "Date: " + date.to_s
+page = agent.get(url + query_period)
+current_page_no = 1
+next_page_link = true
 
-  page = agent.get(url + query_period)
-  current_page_no = 1
-  next_page_link = true
+while next_page_link
+  puts "Scraping page #{current_page_no}..."
+  scrape_page(page)
 
-  while next_page_link
-    puts "Scraping page #{current_page_no}..."
-    scrape_page(page)
-
-    page_links = page.at(".rgNumPart")
-    if page_links
-      next_page_link = page_links.search("a").find{|a| a.inner_text == (current_page_no + 1).to_s}
-    else
-      next_page_link = nil
-    end
-    if next_page_link
-      current_page_no += 1
-      page = click(page, next_page_link)
-    end
+  page_links = page.at(".rgNumPart")
+  if page_links
+    next_page_link = page_links.search("a").find{|a| a.inner_text == (current_page_no + 1).to_s}
+  else
+    next_page_link = nil
+  end
+  if next_page_link
+    current_page_no += 1
+    page = click(page, next_page_link)
   end
 end
